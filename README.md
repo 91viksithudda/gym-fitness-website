@@ -197,17 +197,63 @@ The application includes a complete authentication system using React Context:
 
 ## Deployment
 
-### Backend
-Deploy on platforms like:
-- Heroku
-- AWS EC2
-- DigitalOcean App Platform
+### Backend (Render.com)
+1. Create an account at [Render](https://render.com/)
+2. Create a new Web Service
+3. Connect your GitHub repository
+4. Set the following environment variables:
+   ```
+   MONGODB_URI=your_mongodb_atlas_connection_string
+   JWT_SECRET=your_jwt_secret_key
+   NODE_ENV=production
+   PORT=5001
+   ```
+5. Set build command: `npm install`
+6. Set start command: `npm start`
 
-### Frontend
-Deploy on platforms like:
-- Netlify
-- Vercel
-- GitHub Pages
+### Frontend (Vercel)
+1. Create an account at [Vercel](https://vercel.com/)
+2. Create a new project
+3. Connect your GitHub repository
+4. Set the root directory to `frontend`
+5. Add environment variables:
+   ```
+   REACT_APP_API_URL=https://your-backend-url.onrender.com/api
+   ```
+6. Deploy!
+
+### Environment Variables
+
+#### Backend (.env)
+```
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret_key
+PORT=5001
+NODE_ENV=production
+```
+
+#### Frontend (.env)
+```
+REACT_APP_API_URL=https://your-backend-url.onrender.com/api
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Bad Gateway (502) Error**:
+   - Check that your MongoDB connection string is correct
+   - Ensure all environment variables are set properly
+   - Verify that your backend is running and accessible
+   - Check Render logs for specific error messages
+
+2. **CORS Errors**:
+   - Make sure the frontend URL is added to the CORS configuration in server.js
+   - Check that the REACT_APP_API_URL matches your backend deployment URL
+
+3. **Authentication Issues**:
+   - Verify that JWT_SECRET is the same in both frontend and backend
+   - Check that tokens are being properly sent with requests
 
 ## Future Enhancements
 - Admin panel to add new exercises

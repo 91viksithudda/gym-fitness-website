@@ -1,20 +1,21 @@
 const express = require('express');
 const Progress = require('../models/Progress');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
 // Complete an exercise
-router.post('/complete', async (req, res) => {
+router.post('/complete', auth, async (req, res) => {
   try {
-    const { userId, exerciseId, timeSpent } = req.body;
+    const { exerciseId, timeSpent } = req.body;
 
     // Check if already completed today
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     
     const existingProgress = await Progress.findOne({
-      userId,
+      userId: req.userId,
       exerciseId,
       completedAt: { $gte: startOfDay }
     });
@@ -25,7 +26,7 @@ router.post('/complete', async (req, res) => {
 
     // Create progress record
     const progress = new Progress({
-      userId,
+      userId: req.userId,
       exerciseId,
       timeSpent
     });
@@ -33,7 +34,7 @@ router.post('/complete', async (req, res) => {
     await progress.save();
 
     // Update user coins (+1 coin for completing an exercise)
-    const user = await User.findById(userId);
+    const user = await User.findById(req.userId);
     user.coins += 1;
     
     // Update streak if applicable
@@ -66,8 +67,13 @@ router.post('/complete', async (req, res) => {
 });
 
 // Get user progress
-router.get('/:userId', async (req, res) => {
+router.get('/:userId', auth, async (req, res) => {
   try {
+    // Only allow users to get their own progress
+    if (req.userId !== req.params.userId) {
+      return res.status(401).json({ message: 'Not authorized to view this progress' });
+    }
+    
     const progress = await Progress.find({ userId: req.params.userId })
       .populate('exerciseId')
       .sort({ completedAt: -1 });

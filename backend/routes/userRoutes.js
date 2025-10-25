@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -94,24 +95,21 @@ router.post('/login', async (req, res) => {
 });
 
 // Get user profile
-router.get('/profile', async (req, res) => {
+router.get('/profile', auth, async (req, res) => {
   try {
-    // In a real app, you would get the user ID from the JWT token
-    // For now, we'll simulate this
-    const userId = req.header('Authorization')?.replace('Bearer ', '');
+    // Get user from database using the authenticated user ID
+    const user = await User.findById(req.userId).select('-password');
     
-    if (!userId) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    // In a real implementation, you would verify the token and get the user ID
-    // For now, we'll just send a placeholder response
     res.json({
-      id: userId,
-      name: 'John Doe',
-      email: 'john@example.com',
-      coins: 10,
-      streak: 3
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      coins: user.coins,
+      streak: user.streak
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
