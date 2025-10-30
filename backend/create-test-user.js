@@ -1,10 +1,18 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 
 const connectDB = async () => {
   try {
+    console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'Loaded' : 'Not loaded');
+    
+    if (!process.env.MONGODB_URI) {
+      console.log('Error: MONGODB_URI not found in environment variables');
+      process.exit(1);
+    }
+    
     await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,

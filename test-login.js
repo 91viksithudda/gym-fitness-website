@@ -1,20 +1,22 @@
 const axios = require('axios');
 
-async function testLogin() {
+// Test login with the suggested credentials
+const testLoginUser = async () => {
   try {
-    console.log('Testing login for Viksit Hudda...');
     const response = await axios.post('http://localhost:5001/api/users/login', {
-      email: 'viksithudda44@gmail.com',
-      password: 'yourpassword'
+      email: 'test@example.com',
+      password: 'password123'
     });
     
-    console.log('Login successful:', response.data);
+    console.log('Login successful!');
+    console.log('Token:', response.data.token);
+    console.log('User:', response.data.user);
+    return response.data.token;
   } catch (error) {
-    console.error('Login failed:', error.response?.data || error.message);
+    console.error('Login failed:', error.response?.data?.message || error.message);
+    return null;
   }
-}
-
-testLogin();
+};
 
 // Test user registration
 async function testRegistration() {
@@ -30,22 +32,7 @@ async function testRegistration() {
     return response.data.token;
   } catch (error) {
     console.error('Registration failed:', error.response?.data || error.message);
-  }
-}
-
-// Test user login
-async function testLogin() {
-  try {
-    console.log('Testing user login...');
-    const response = await axios.post('http://localhost:5001/api/users/login', {
-      email: 'test@example.com',
-      password: 'password123'
-    });
-    
-    console.log('Login successful:', response.data);
-    return response.data.token;
-  } catch (error) {
-    console.error('Login failed:', error.response?.data || error.message);
+    return null;
   }
 }
 
@@ -53,18 +40,20 @@ async function testLogin() {
 async function runTests() {
   console.log('Starting API tests...\n');
   
-  // Try login first (should fail if user doesn't exist)
-  await testLogin();
+  // Try login first
+  let token = await testLoginUser();
   
-  console.log('\n---\n');
-  
-  // Try registration
-  const token = await testRegistration();
-  
-  console.log('\n---\n');
-  
-  // Try login again (should succeed if registration worked)
-  await testLogin();
+  if (!token) {
+    console.log('\nLogin failed, trying registration...\n');
+    // Try registration
+    token = await testRegistration();
+    
+    if (token) {
+      console.log('\n---\n');
+      // Try login again after registration
+      await testLoginUser();
+    }
+  }
 }
 
 runTests();
