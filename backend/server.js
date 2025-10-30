@@ -1,47 +1,29 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
-require('dotenv').config();
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+// Load environment variables
+dotenv.config();
+
+// Import routes
+const userRoutes = require('./routes/userRoutes');
+const exerciseRoutes = require('./routes/exerciseRoutes');
+const progressRoutes = require('./routes/progressRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
+const couponRoutes = require('./routes/couponRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+const workoutRoutes = require('./routes/workoutRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // Middleware
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL || 'https://your-frontend-domain.vercel.app']  // Update this to your actual frontend URL
-    : ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB with improved options
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      tlsAllowInvalidCertificates: true,
-      tlsAllowInvalidHostnames: true,
-      retryWrites: true,
-      retryReads: true,
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-    });
-    console.log('Connected to MongoDB Atlas');
-  } catch (error) {
-    console.log('MongoDB connection error:', error.message);
-    // Exit process with failure
-    process.exit(1);
-  }
-};
-
-connectDB();
-
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     status: 'OK', 
     timestamp: new Date().toISOString(),
@@ -50,32 +32,27 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.get('/', (req, res) => {
-  res.send('Gym Fitness API is running...');
-});
+app.use('/api/users', userRoutes);
+app.use('/api/exercises', exerciseRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/workout', workoutRoutes);
 
-// User routes
-app.use('/api/users', require('./routes/userRoutes'));
-
-// Exercise routes
-app.use('/api/exercises', require('./routes/exerciseRoutes'));
-
-// Progress routes
-app.use('/api/progress', require('./routes/progressRoutes'));
-
-// Leaderboard routes
-app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
-
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static('public'));
-
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('Connected to MongoDB Atlas');
+  // Start the server only after successful database connection
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
   });
-}
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+})
+.catch((error) => {
+  console.error('Database connection error:', error);
+  process.exit(1); // Exit if database connection fails
 });

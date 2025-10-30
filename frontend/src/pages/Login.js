@@ -25,19 +25,22 @@ const Login = () => {
     setError('');
     
     try {
+      console.log('Attempting login with:', { email, password });
       const result = await login({
         email: formData.email,
         password: formData.password
       });
+      console.log('Login result:', result);
       
       if (result.success) {
         navigate('/');
       } else {
-        setError(result.error);
+        setError(result.error || 'Invalid credentials. Please try again.');
       }
       
       setLoading(false);
     } catch (error) {
+      console.error('Login error:', error);
       setLoading(false);
       setError('Invalid credentials. Please try again.');
     }
@@ -103,6 +106,12 @@ const Login = () => {
               <Link to="/register" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                 Register here
               </Link>
+            </p>
+          </div>
+          
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Hint: Try email "test@example.com" with password "password123"
             </p>
           </div>
         </div>

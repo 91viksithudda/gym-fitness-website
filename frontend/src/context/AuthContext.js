@@ -17,7 +17,8 @@ const AUTH_ACTION_TYPES = {
   REGISTER_START: 'REGISTER_START',
   REGISTER_SUCCESS: 'REGISTER_SUCCESS',
   REGISTER_FAILURE: 'REGISTER_FAILURE',
-  SET_USER: 'SET_USER'
+  SET_USER: 'SET_USER',
+  UPDATE_USER: 'UPDATE_USER'
 };
 
 // Auth reducer
@@ -58,6 +59,15 @@ const authReducer = (state, action) => {
         user: action.payload,
         loading: false
       };
+    case AUTH_ACTION_TYPES.UPDATE_USER:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          ...action.payload
+        },
+        loading: false
+      };
     default:
       return state;
   }
@@ -79,6 +89,7 @@ export const AuthProvider = ({ children }) => {
           const response = await userAPI.getProfile();
           dispatch({ type: AUTH_ACTION_TYPES.SET_USER, payload: response.data });
         } catch (error) {
+          console.error('Profile fetch error:', error);
           localStorage.removeItem('token');
           dispatch({ type: AUTH_ACTION_TYPES.SET_USER, payload: null });
         }
@@ -93,15 +104,20 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (credentials) => {
     try {
+      console.log('AuthContext: Attempting login with credentials:', credentials);
       dispatch({ type: AUTH_ACTION_TYPES.LOGIN_START });
       
       const response = await userAPI.login(credentials);
+      console.log('AuthContext: Login API response:', response);
+      
       localStorage.setItem('token', response.data.token);
       dispatch({ type: AUTH_ACTION_TYPES.LOGIN_SUCCESS, payload: response.data });
       
       return { success: true };
     } catch (error) {
+      console.error('AuthContext: Login error:', error);
       const errorMessage = error.response?.data?.message || 'Login failed';
+      console.log('AuthContext: Error message:', errorMessage);
       dispatch({ type: AUTH_ACTION_TYPES.LOGIN_FAILURE, payload: errorMessage });
       return { success: false, error: errorMessage };
     }
@@ -130,6 +146,11 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTION_TYPES.LOGOUT });
   };
 
+  // Update user function
+  const updateUser = (userData) => {
+    dispatch({ type: AUTH_ACTION_TYPES.UPDATE_USER, payload: userData });
+  };
+
   // Value for context provider
   const value = {
     user: state.user,
@@ -137,7 +158,8 @@ export const AuthProvider = ({ children }) => {
     error: state.error,
     login,
     register,
-    logout
+    logout,
+    updateUser
   };
 
   return (

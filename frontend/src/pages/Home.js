@@ -14,11 +14,11 @@ const Home = () => {
             Join our community of fitness enthusiasts and achieve your health goals with personalized workout plans and progress tracking.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/register" className="btn-primary text-center">
+            <Link to="/subscription" className="btn-primary text-center">
               Join Now - It's Free!
             </Link>
             <Link to="/exercises" className="btn-secondary text-center text-white dark:text-gray-800">
-              View Exercises
+              Add Exercises
             </Link>
           </div>
         </div>
@@ -32,37 +32,52 @@ const Home = () => {
             <div className="text-4xl mb-4">💪</div>
             <h3 className="text-xl font-bold mb-2 dark:text-white">Personalized Workouts</h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Get customized exercise plans based on your fitness level and goals.
+              Create custom workout plans tailored to your fitness level and goals.
             </p>
           </div>
-          
+          <div className="card p-6">
+            <div className="text-4xl mb-4">⏱️</div>
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Timer Integration</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Built-in timers for each exercise to help you track your workout duration.
+            </p>
+          </div>
           <div className="card p-6">
             <div className="text-4xl mb-4">🏆</div>
-            <h3 className="text-xl font-bold mb-2 dark:text-white">Reward System</h3>
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Progress Tracking</h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Earn coins for completing exercises and climb the leaderboard.
-            </p>
-          </div>
-          
-          <div className="card p-6">
-            <div className="text-4xl mb-4">📊</div>
-            <h3 className="text-xl font-bold mb-2 dark:text-white">Track Progress</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Monitor your improvements with detailed statistics and analytics.
+              Monitor your fitness journey with detailed progress reports and achievements.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Motivation Section */}
-      <section className="bg-gray-200 dark:bg-gray-800 rounded-2xl p-8 text-center">
-        <h2 className="text-3xl font-bold mb-4 dark:text-white">Ready to Start Your Fitness Journey?</h2>
-        <p className="text-xl mb-6 text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
-          "The only bad workout is the one that didn't happen." - Unknown
-        </p>
-        <Link to="/register" className="btn-primary inline-block">
-          Get Started Today
-        </Link>
+      {/* How It Works Section */}
+      <section className="mb-12">
+        <h2 className="text-3xl font-bold text-center mb-8 dark:text-white">How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="text-center">
+            <div className="text-5xl mb-4">1</div>
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Sign Up</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Create your free account and set up your profile.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="text-5xl mb-4">2</div>
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Add Exercises</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Browse our exercise library and add workouts to your routine.
+            </p>
+          </div>
+          <div className="text-center">
+            <div className="text-5xl mb-4">3</div>
+            <h3 className="text-xl font-bold mb-2 dark:text-white">Track Progress</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Complete workouts and monitor your improvements over time.
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   );

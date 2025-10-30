@@ -1,156 +1,170 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { progressAPI, userAPI } from '../services/api';
+import { progressAPI } from '../services/api';
 
 const Profile = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalExercises: 0,
-    coins: 0,
-    streak: 0,
-    level: 1
-  });
-
-  // Mock data since we can't connect to backend
-  const mockCompletedExercises = [
-    { id: 1, name: 'Push-ups', date: '2023-05-15' },
-    { id: 2, name: 'Squats', date: '2023-05-16' },
-    { id: 3, name: 'Plank', date: '2023-05-17' },
-    { id: 4, name: 'Bicep Curls', date: '2023-05-18' }
-  ];
+  const [progress, setProgress] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserStats = async () => {
-      if (user) {
-        try {
+    const fetchProgress = async () => {
+      try {
+        if (user) {
           // In a real app, you would fetch from the backend
           // const response = await progressAPI.getUserProgress(user.id);
-          // const userResponse = await userAPI.getProfile();
+          // setProgress(response.data);
           
-          // Simulate fetching user stats
+          // For now, we'll use mock data
           setTimeout(() => {
-            setStats({
-              totalExercises: 12,
-              coins: user.coins || 10,
-              streak: user.streak || 3,
-              level: Math.floor((user.coins || 10) / 5) + 1
-            });
-          }, 500);
-        } catch (error) {
-          console.error('Error fetching user stats:', error);
+            setProgress([
+              {
+                _id: '1',
+                exerciseId: { name: 'Push-ups' },
+                completedAt: new Date(),
+                timeSpent: 120
+              },
+              {
+                _id: '2',
+                exerciseId: { name: 'Squats' },
+                completedAt: new Date(Date.now() - 86400000),
+                timeSpent: 180
+              }
+            ]);
+            setLoading(false);
+          }, 1000);
         }
+      } catch (error) {
+        console.error('Error fetching progress:', error);
+        setLoading(false);
       }
     };
 
-    fetchUserStats();
+    fetchProgress();
   }, [user]);
 
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4 dark:text-white">Profile</h1>
-          <p className="text-lg dark:text-gray-300">Please log in to view your profile.</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <p className="mt-4 text-lg dark:text-white">Loading profile...</p>
         </div>
       </div>
     );
   }
 
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString();
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}m ${secs}s`;
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">Your Profile</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center dark:text-white">User Profile</h1>
       
-      {/* User Info Card */}
-      <div className="card mb-8">
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center mr-4 mb-4 md:mb-0">
-              <span className="text-2xl">👤</span>
-            </div>
-            <div className="text-center md:text-left">
-              <h2 className="text-2xl font-bold dark:text-white">{user.name}</h2>
-              <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
-            </div>
-            <div className="ml-auto flex space-x-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-500">{stats.coins}</div>
-                <div className="text-gray-600 dark:text-gray-300">Coins</div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* User Info Card */}
+        <div className="lg:col-span-1 card">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-6 dark:text-white">Profile Information</h2>
+            
+            <div className="flex flex-col items-center mb-6">
+              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center text-gray-500 mb-4">
+                {user.name.charAt(0)}
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-500">{stats.streak}</div>
-                <div className="text-gray-600 dark:text-gray-300">Streak</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-500">{stats.level}</div>
-                <div className="text-gray-600 dark:text-gray-300">Level</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="card p-6">
-          <h3 className="text-lg font-bold mb-4 dark:text-white">Progress Stats</h3>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-gray-600 dark:text-gray-300">Workouts Completed</span>
-                <span className="font-bold dark:text-white">{stats.totalExercises}</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full" 
-                  style={{ width: `${Math.min(100, (stats.totalExercises / 20) * 100)}%` }}
-                ></div>
-              </div>
+              <h3 className="text-xl font-bold dark:text-white">{user.name}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
             </div>
             
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-gray-600 dark:text-gray-300">Coins Earned</span>
-                <span className="font-bold dark:text-white">{stats.coins}</span>
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="font-medium dark:text-gray-300">Coins:</span>
+                <span className="font-bold text-yellow-600 dark:text-yellow-400">{user.coins || 0}</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                <div 
-                  className="bg-yellow-500 h-2 rounded-full" 
-                  style={{ width: `${Math.min(100, (stats.coins / 50) * 100)}%` }}
-                ></div>
+              
+              <div className="flex justify-between">
+                <span className="font-medium dark:text-gray-300">Current Streak:</span>
+                <span className="font-bold text-green-600 dark:text-green-400">{user.streak || 0} days</span>
               </div>
+              
+              <div className="flex justify-between">
+                <span className="font-medium dark:text-gray-300">Subscription:</span>
+                <span className="font-bold text-blue-600 dark:text-blue-400">
+                  {user.subscription?.status === 'active' ? 'Premium' : 'Free'}
+                </span>
+              </div>
+              
+              {user.subscription?.status === 'active' && (
+                <div className="flex justify-between">
+                  <span className="font-medium dark:text-gray-300">Expires:</span>
+                  <span className="font-bold dark:text-white">
+                    {user.subscription.endDate ? formatDate(user.subscription.endDate) : 'N/A'}
+                  </span>
+                </div>
+              )}
             </div>
             
-            <div>
-              <div className="flex justify-between mb-1">
-                <span className="text-gray-600 dark:text-gray-300">Current Streak</span>
-                <span className="font-bold dark:text-white">{stats.streak} days</span>
+            {user.subscription?.status !== 'active' && (
+              <div className="mt-6">
+                <a 
+                  href="/subscription" 
+                  className="btn-primary w-full text-center block"
+                >
+                  Upgrade to Premium
+                </a>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                <div 
-                  className="bg-red-500 h-2 rounded-full" 
-                  style={{ width: `${Math.min(100, (stats.streak / 30) * 100)}%` }}
-                ></div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
         
-        {/* Recent Activity */}
-        <div className="card p-6 md:col-span-2">
-          <h3 className="text-lg font-bold mb-4 dark:text-white">Recent Activity</h3>
-          <div className="space-y-4">
-            {mockCompletedExercises.map((exercise) => (
-              <div key={exercise.id} className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <div className="mr-4 text-2xl">💪</div>
-                <div className="flex-1">
-                  <h4 className="font-bold dark:text-white">{exercise.name}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Completed on {exercise.date}</p>
-                </div>
-                <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
-                  +1 coin
-                </div>
+        {/* Progress History Card */}
+        <div className="lg:col-span-2 card">
+          <div className="p-6">
+            <h2 className="text-2xl font-bold mb-6 dark:text-white">Exercise History</h2>
+            
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
               </div>
-            ))}
+            ) : progress.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-600 dark:text-gray-400">No exercise history yet.</p>
+                <a href="/exercises" className="btn-primary mt-4 inline-block">Start Exercising</a>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Exercise</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {progress.map((item) => (
+                      <tr key={item._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium dark:text-white">
+                          {item.exerciseId?.name || 'Unknown Exercise'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          {formatDate(item.completedAt)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                          {formatTime(item.timeSpent)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </div>

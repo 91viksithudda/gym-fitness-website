@@ -4,12 +4,15 @@ import { AuthProvider } from './context/AuthContext';
 import Header from './components/Header';
 import Home from './pages/Home';
 import Exercises from './pages/Exercises';
+import WorkoutHistory from './pages/WorkoutHistory';
 import Profile from './pages/Profile';
 import Leaderboard from './pages/Leaderboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ProtectedRoute from './components/ProtectedRoute';
-import './App.css';
+import Subscription from './pages/Subscription';
+import Admin from './pages/Admin';
+import CouponAdmin from './pages/CouponAdmin';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   const [backendStatus, setBackendStatus] = React.useState('checking');
@@ -41,9 +44,25 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/exercises" element={<Exercises />} />
+              <Route path="/workout-history" element={
+                <ProtectedRoute>
+                  <WorkoutHistory />
+                </ProtectedRoute>
+              } />
               <Route path="/leaderboard" element={<Leaderboard />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/subscription" element={<Subscription />} />
+              <Route path="/admin" element={
+                <ProtectedRoute>
+                  <Admin />
+                </ProtectedRoute>
+              } />
+              <Route path="/coupon-admin" element={
+                <ProtectedRoute>
+                  <CouponAdmin />
+                </ProtectedRoute>
+              } />
               <Route path="/profile" element={
                 <ProtectedRoute>
                   <Profile />

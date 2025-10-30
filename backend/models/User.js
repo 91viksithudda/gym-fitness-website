@@ -25,7 +25,33 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: Date.now
-  }
+  },
+  subscription: {
+    status: {
+      type: String,
+      enum: ['inactive', 'active', 'expired'],
+      default: 'inactive'
+    },
+    startDate: {
+      type: Date
+    },
+    endDate: {
+      type: Date
+    },
+    plan: {
+      type: String,
+      enum: ['basic', 'premium'],
+      default: 'basic'
+    }
+  },
+  usedCoupons: [{
+    code: String,
+    discount: Number,
+    usedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true
 });

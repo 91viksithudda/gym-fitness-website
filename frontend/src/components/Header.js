@@ -68,11 +68,21 @@ const Header = ({ darkMode, toggleDarkMode, backendStatus }) => {
                   <Link to="/exercises" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
                     Exercises
                   </Link>
+                  <Link to="/workout-history" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                    History
+                  </Link>
+                  <Link to="/subscription" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                    Subscription
+                  </Link>
                   <Link to="/profile" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
                     Profile
                   </Link>
                   <Link to="/leaderboard" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
                     Leaderboard
+                  </Link>
+                  {/* In a real app, you would check if user is admin */}
+                  <Link to="/admin" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400">
+                    Admin
                   </Link>
                 </nav>
                 <button
@@ -87,7 +97,7 @@ const Header = ({ darkMode, toggleDarkMode, backendStatus }) => {
                 <Link to="/login" className="btn-secondary text-sm">
                   Login
                 </Link>
-                <Link to="/register" className="btn-primary text-sm">
+                <Link to="/subscription" className="btn-primary text-sm">
                   Register
                 </Link>
               </div>

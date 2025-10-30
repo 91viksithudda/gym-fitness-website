@@ -1,23 +1,14 @@
-# Gym Fitness Website - MERN Stack
+# Gym Fitness Website
 
-A full-stack fitness application built with the MERN stack (MongoDB, Express, React, Node.js) that allows users to track workouts, earn rewards, and compete on leaderboards.
+A full-stack MERN application for tracking gym workouts with timer functionality, user authentication, and progress tracking.
 
 ## Features
-
-### Frontend (React + Tailwind CSS)
-- Home Page with attractive hero section
-- Exercise Dashboard showing exercises with details
-- Task system with coin rewards for completed exercises
-- User Profile Page with stats and progress tracking
-- Leaderboard showing top users
-- Responsive design for mobile and desktop
-- Dark/Light mode toggle
-
-### Backend (Node.js + Express + MongoDB)
-- User Authentication (Registration, Login, JWT)
-- Exercise Management API
-- Progress Tracking API
-- Leaderboard API
+- User authentication (register/login)
+- Exercise library with filtering by body part and category
+- Workout timer with alarm sound
+- Progress tracking and leaderboard
+- Subscription management with coupon codes
+- Responsive design with dark mode support
 
 ## Project Structure
 
@@ -27,12 +18,18 @@ gym-fitness-website/
 │   ├── models/
 │   │   ├── User.js
 │   │   ├── Exercise.js
-│   │   └── Progress.js
+│   │   ├── Progress.js
+│   │   ├── Coupon.js
+│   │   └── Payment.js
 │   ├── routes/
 │   │   ├── userRoutes.js
 │   │   ├── exerciseRoutes.js
 │   │   ├── progressRoutes.js
-│   │   └── leaderboardRoutes.js
+│   │   ├── leaderboardRoutes.js
+│   │   ├── couponRoutes.js
+│   │   └── paymentRoutes.js
+│   ├── middleware/
+│   │   └── auth.js
 │   ├── server.js
 │   ├── package.json
 │   └── .env
@@ -42,8 +39,6 @@ gym-fitness-website/
     ├── src/
     │   ├── components/
     │   │   ├── Header.js
-    │   │   ├── DashboardExample.js
-    │   │   ├── UserProfileExample.js
     │   │   └── ProtectedRoute.js
     │   ├── context/
     │   │   └── AuthContext.js
@@ -55,9 +50,13 @@ gym-fitness-website/
     │   │   ├── Profile.js
     │   │   ├── Leaderboard.js
     │   │   ├── Login.js
-    │   │   └── Register.js
+    │   │   ├── Register.js
+    │   │   ├── Subscription.js
+    │   │   └── Admin.js
     │   ├── services/
     │   │   └── api.js
+    │   ├── utils/
+    │   │   └── alarm.js
     │   ├── App.js
     │   ├── index.js
     │   └── index.css
@@ -65,6 +64,9 @@ gym-fitness-website/
     ├── tailwind.config.js
     └── .gitignore
 ├── README.md
+├── DEPLOYMENT.md
+├── TROUBLESHOOTING.md
+├── PAYMENT_INTEGRATION.md
 └── .gitignore
 ```
 
@@ -87,7 +89,7 @@ gym-fitness-website/
 
 3. Create a `.env` file with your configuration:
    ```
-   PORT=5000
+   PORT=5001
    MONGODB_URI=your_mongodb_connection_string
    JWT_SECRET=your_jwt_secret_key
    ```
@@ -132,6 +134,42 @@ gym-fitness-website/
 ### Leaderboard
 - `GET /api/leaderboard` - Get top users
 
+### Coupons
+- `POST /api/coupons` - Create a new coupon (admin)
+- `GET /api/coupons` - Get all active coupons
+- `POST /api/coupons/validate` - Validate a coupon
+
+### Payments
+- `POST /api/payments/create-order` - Create a payment order
+- `POST /api/payments/verify-payment` - Verify payment
+- `GET /api/payments/history` - Get user's payment history
+
+## Subscription System
+
+The application now includes a subscription system with the following features:
+
+1. **Pricing**: ₹250 per month for premium access
+2. **Coupon System**: Users can apply coupons for discounts
+3. **Payment Integration**: Ready for integration with Razorpay or other payment gateways
+4. **Subscription Management**: Track user subscriptions and expiration dates
+
+### Coupon Functionality
+- Users can apply coupon codes to get discounts
+- Default coupons included:
+  - WELCOME10: 10% off
+  - FITNESS20: 20% off
+  - NEWYEAR15: 15% off
+- Admins can create new coupons through the admin panel
+
+### Payment Integration
+The system is ready for integration with payment gateways like:
+- Razorpay
+- Stripe
+- PayPal
+- Paytm
+
+See [PAYMENT_INTEGRATION.md](PAYMENT_INTEGRATION.md) for detailed integration instructions.
+
 ## Connecting Frontend to Backend
 
 The frontend uses Axios to communicate with the backend API. Configure the API base URL in your frontend code:
@@ -141,59 +179,11 @@ The frontend uses Axios to communicate with the backend API. Configure the API b
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'http://localhost:5001/api'
 });
 
 export default API;
 ```
-
-### Custom Hooks
-
-The application also provides custom React hooks for easier API integration:
-
-- `useExercises` - Fetch all exercises
-- `useUserProgress` - Fetch user progress data
-- `useLeaderboard` - Fetch leaderboard data
-- `useUserProfile` - Fetch user profile data
-
-Example usage:
-
-```javascript
-import { useExercises } from '../hooks/useApi';
-
-const MyComponent = () => {
-  const { exercises, loading, error } = useExercises();
-  
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  
-  return (
-    <div>
-      {exercises.map(exercise => (
-        <div key={exercise._id}>{exercise.name}</div>
-      ))}
-    </div>
-  );
-};
-```
-
-### Example Components
-
-We've also included example components that demonstrate best practices:
-
-- `DashboardExample.js` - Shows how to use custom hooks in a real component
-- `UserProfileExample.js` - Demonstrates authentication context usage
-- `ProtectedRoute.js` - Shows how to implement route protection
-- API service integration in all page components
-
-### Authentication Context
-
-The application includes a complete authentication system using React Context:
-
-- `AuthContext.js` - Provides global state management for user authentication
-- Login, registration, and logout functionality
-- Token persistence in localStorage
-- Protected routes pattern
 
 ## Deployment
 
@@ -222,9 +212,9 @@ The application includes a complete authentication system using React Context:
    ```
 6. Deploy!
 
-### Environment Variables
+## Environment Variables
 
-#### Backend (.env)
+### Backend (.env)
 ```
 MONGODB_URI=your_mongodb_atlas_connection_string
 JWT_SECRET=your_jwt_secret_key
@@ -232,7 +222,7 @@ PORT=5001
 NODE_ENV=production
 ```
 
-#### Frontend (.env)
+### Frontend (.env)
 ```
 REACT_APP_API_URL=https://your-backend-url.onrender.com/api
 ```
@@ -261,6 +251,8 @@ REACT_APP_API_URL=https://your-backend-url.onrender.com/api
 - Social features (friends, challenges)
 - Mobile app version
 - Advanced analytics and reporting
+- Integration with wearable devices
+- Personalized workout recommendations
 
 ## License
 This project is licensed under the MIT License.
